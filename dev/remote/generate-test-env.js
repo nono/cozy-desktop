@@ -15,12 +15,14 @@ const storage = new cozy.MemoryStorage()
 const automatedRegistration = new Registration(cozyUrl, storage, (authorizeUrl) => {
   return new Promise((resolve, reject) => {
     console.log('Login...')
-    client.post({url: url.resolve(cozyUrl, '/auth/login'), form: {passphrase}}, (err) => {
-      if (err) { reject(err) }
+    client.post({url: url.resolve(cozyUrl, '/auth/login'), form: {passphrase}}, (err, res) => {
+      if (err) { return reject(err) }
+      console.log('1 res', res)
 
       console.log('Load authorization form...')
-      client({url: authorizeUrl}, (err, _, body) => {
-        if (err) { reject(err) }
+      client({url: authorizeUrl}, (err, res, body) => {
+        if (err) { return reject(err) }
+        console.log('2 res', res)
 
         console.log('Parse authorization form...')
         const $ = cheerio.load(body)
@@ -31,11 +33,17 @@ const automatedRegistration = new Registration(cozyUrl, storage, (authorizeUrl) 
 
         console.log('Authorize...')
         client.post({url: authorizeUrl, form}, (err, res) => {
-          if (err) { reject(err) }
+          console.log('err', err)
+          console.log('3 res', res)
+          if (err) { return reject(err) }
 
           console.log('Save credentials...')
+          console.log('res.headers', res.headers)
+          if (!res.headers.location) {
+            return reject(new Error('No location'))
+          }
           client({url: res.headers.location}, (err) => {
-            if (err) { reject(err) }
+            if (err) { return reject(err) }
 
             resolve(cozyUrl)
           })
