@@ -1,5 +1,4 @@
-{
-    "version": "1.0.0",
+{test/elm/elm-package.json    "version": "1.0.0",
     "summary": "Cozy Drive Tests",
     "repository": "https://github.com/cozy-labs/cozy-desktop.git",
     "license": "AGPL-3.0",
